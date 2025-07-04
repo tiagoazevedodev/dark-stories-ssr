@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro no Pagamento - Black Stories</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-mask mr-2"></i>Black Stories
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <% if (user) { %>
+                    <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-dashboard mr-2"></i>Dashboard
+                    </a>
+                    <% } else { %>
+                    <a href="/login" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                    </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Error Icon -->
+        <div class="text-center mb-8">
+            <div class="w-32 h-32 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-exclamation-triangle text-5xl text-white"></i>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                Ops! Algo deu errado
+            </h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Infelizmente não conseguimos processar o seu pagamento. Mas não se preocupe, vamos ajudar você!
+            </p>
+        </div>
+
+        <!-- Error Details -->
+        <div class="bg-red-900 bg-opacity-50 border border-red-500 rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-info-circle mr-2"></i>O que aconteceu?
+            </h3>
+            <% if (error && error.message) { %>
+            <p class="text-gray-300 mb-4">
+                <strong>Detalhes do erro:</strong> <%= error.message %>
+            </p>
+            <% } %>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="font-bold mb-2">Possíveis causas:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• Cartão de crédito expirado ou bloqueado</li>
+                        <li>• Dados de pagamento incorretos</li>
+                        <li>• Limite de crédito insuficiente</li>
+                        <li>• Problema temporário com o processador</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">O que você pode fazer:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• Verificar os dados do cartão</li>
+                        <li>• Tentar com outro cartão</li>
+                        <li>• Aguardar alguns minutos e tentar novamente</li>
+                        <li>• Entrar em contato conosco</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mb-8">
+            <h3 class="text-2xl font-bold mb-6">O que você gostaria de fazer?</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <a href="/subscribe" class="bg-purple-600 hover:bg-purple-700 p-6 rounded-xl transition-colors group">
+                    <i class="fas fa-redo text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold mb-2">Tentar Novamente</h4>
+                    <p class="text-sm opacity-80">Voltar para a página de assinatura</p>
+                </a>
+                
+                <a href="/dashboard" class="bg-gray-600 hover:bg-gray-700 p-6 rounded-xl transition-colors group">
+                    <i class="fas fa-dashboard text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold mb-2">Ir para Dashboard</h4>
+                    <p class="text-sm opacity-80">Continuar com a conta gratuita</p>
+                </a>
+                
+                <a href="mailto:suporte@blackstories.com" class="bg-blue-600 hover:bg-blue-700 p-6 rounded-xl transition-colors group">
+                    <i class="fas fa-envelope text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="font-bold mb-2">Entrar em Contato</h4>
+                    <p class="text-sm opacity-80">Falar com nossa equipe de suporte</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Alternative Payment Methods -->
+        <div class="bg-gray-800 rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-credit-card mr-2"></i>Métodos de Pagamento Aceitos
+            </h3>
+            <p class="text-gray-400 mb-4">
+                Aceitamos os seguintes métodos de pagamento para sua conveniência:
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flex items-center justify-center bg-gray-700 rounded-lg p-4">
+                    <i class="fab fa-cc-visa text-2xl text-blue-500"></i>
+                    <span class="ml-2">Visa</span>
+                </div>
+                <div class="flex items-center justify-center bg-gray-700 rounded-lg p-4">
+                    <i class="fab fa-cc-mastercard text-2xl text-red-500"></i>
+                    <span class="ml-2">Mastercard</span>
+                </div>
+                <div class="flex items-center justify-center bg-gray-700 rounded-lg p-4">
+                    <i class="fab fa-cc-amex text-2xl text-blue-400"></i>
+                    <span class="ml-2">Amex</span>
+                </div>
+                <div class="flex items-center justify-center bg-gray-700 rounded-lg p-4">
+                    <i class="fas fa-university text-2xl text-green-500"></i>
+                    <span class="ml-2">PIX</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-gray-800 rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-question-circle mr-2"></i>Perguntas Frequentes
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-bold mb-2">Meu cartão foi cobrado mesmo com o erro?</h4>
+                    <p class="text-gray-400 text-sm">
+                        Não se preocupe! Se o pagamento não foi processado com sucesso, não houve cobrança no seu cartão. 
+                        Qualquer pré-autorização será estornada automaticamente em até 3 dias úteis.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Quantas vezes posso tentar?</h4>
+                    <p class="text-gray-400 text-sm">
+                        Você pode tentar quantas vezes quiser. Recomendamos aguardar alguns minutos entre tentativas 
+                        e verificar os dados do cartão antes de tentar novamente.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2">Posso usar outro método de pagamento?</h4>
+                    <p class="text-gray-400 text-sm">
+                        Sim! Além de cartões de crédito, também aceitamos PIX para maior conveniência. 
+                        Selecione sua opção preferida na página de assinatura.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Contact -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center">
+            <h3 class="text-2xl font-bold mb-4">Ainda precisa de ajuda?</h3>
+            <p class="text-lg mb-6 opacity-90">
+                Nossa equipe de suporte está disponível 24/7 para ajudar você com qualquer problema de pagamento.
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-6">
+                <a href="mailto:suporte@blackstories.com" 
+                   class="bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>Email: suporte@blackstories.com
+                </a>
+                <a href="https://wa.me/5511999999999" 
+                   class="bg-green-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-600 transition-colors">
+                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp: (11) 99999-9999
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                © 2024 Black Stories. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+</body>
+</html> 

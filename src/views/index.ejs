@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Stories - Histórias Misteriosas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-mask mr-2"></i>Black Stories
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <% if (user) { %>
+                        <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-dashboard mr-2"></i>Dashboard
+                        </a>
+                        <% if (user.isSubscriber) { %>
+                            <a href="/history" class="text-purple-400 hover:text-purple-300 px-3 py-2 rounded-md">
+                                <i class="fas fa-history mr-2"></i>Histórico
+                            </a>
+                            <a href="/create" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                                <i class="fas fa-plus mr-2"></i>Criar
+                            </a>
+                        <% } else { %>
+                            <a href="/premium" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-md">
+                                <i class="fas fa-crown mr-2"></i>Premium
+                            </a>
+                        <% } %>
+                        <form action="/logout" method="POST" class="inline">
+                            <button type="submit" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <a href="/login" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                        </a>
+                        <a href="/register" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                            <i class="fas fa-user-plus mr-2"></i>Cadastrar
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Black Stories
+                </span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-8">
+                Resolva mistérios intrigantes todos os dias. Histórias geradas por IA que desafiam sua mente.
+            </p>
+        </div>
+
+        <!-- Daily Card -->
+        <% if (card) { %>
+        <div class="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-day text-purple-400 mr-2"></i>
+                        <span class="text-sm text-gray-400">
+                            Card do dia - <%= new Date(card.generatedAt).toLocaleDateString('pt-BR') %>
+                        </span>
+                    </div>
+                    <% if (card.theme) { %>
+                    <span class="bg-purple-600 text-xs px-2 py-1 rounded-full">
+                        <%= card.theme.name %>
+                    </span>
+                    <% } %>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-4 text-white">
+                    <%= card.title %>
+                </h2>
+
+                <% if (card.imageUrl) { %>
+                <div class="mb-6">
+                    <img src="<%= card.imageUrl %>" alt="<%= card.title %>" 
+                         class="w-full h-64 object-cover rounded-lg">
+                </div>
+                <% } %>
+
+                <div class="prose prose-invert max-w-none mb-6">
+                    <p class="text-lg text-gray-300 leading-relaxed">
+                        <%= card.teaser %>
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-sm text-gray-400">
+                        <span>
+                            <i class="fas fa-eye mr-1"></i>
+                            <%= card.viewsCount %> visualizações
+                        </span>
+                        <span>
+                            <i class="fas fa-heart mr-1"></i>
+                            <%= card.likesCount %> curtidas
+                        </span>
+                    </div>
+                    
+                    <a href="/card/<%= card.id %>" 
+                       class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-play mr-2"></i>Resolver Mistério
+                    </a>
+                </div>
+            </div>
+        </div>
+        <% } else { %>
+        <div class="bg-gray-800 rounded-2xl p-8 text-center">
+            <i class="fas fa-ghost text-6xl text-gray-600 mb-4"></i>
+            <h3 class="text-2xl font-bold mb-2">Nenhum mistério hoje</h3>
+            <p class="text-gray-400">O card diário ainda não foi gerado. Volte mais tarde!</p>
+        </div>
+        <% } %>
+
+        <!-- Features Section -->
+        <div class="grid md:grid-cols-3 gap-8 mt-16">
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-brain text-4xl text-purple-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Desafios Diários</h3>
+                <p class="text-gray-400">Novos mistérios gerados por IA todos os dias para exercitar sua mente.</p>
+            </div>
+            
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-users text-4xl text-purple-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Comunidade</h3>
+                <p class="text-gray-400">Compartilhe suas teorias e veja como outros resolveram os mistérios.</p>
+            </div>
+            
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-crown text-4xl text-yellow-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Premium</h3>
+                <p class="text-gray-400">Acesso ao histórico completo e criação de histórias personalizadas.</p>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <% if (!user) { %>
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-center mt-16">
+            <h3 class="text-3xl font-bold mb-4">Pronto para o desafio?</h3>
+            <p class="text-xl mb-6">Cadastre-se gratuitamente e comece a resolver mistérios hoje mesmo!</p>
+            <div class="space-x-4">
+                <a href="/register" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                    Começar Agora
+                </a>
+                <a href="/login" class="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-purple-600 transition-colors">
+                    Já tenho conta
+                </a>
+            </div>
+        </div>
+        <% } %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2024 Black Stories. Todos os direitos reservados.</p>
+            <p class="mt-2">Histórias geradas por IA para entretenimento.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        String    @id @default(uuid())
+  name                      String
+  email                     String    @unique
+  passwordHash              String
+  isSubscriber              Boolean   @default(false)
+  subscriptionExpiresAt     DateTime?
+  paymentProviderCustomerId String?
+  createdAt                 DateTime  @default(now())
+
+  customCards CustomCard[]
+  likes       Like[]
+  views       View[]
+}
+
+model Theme {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  color       String?
+
+  dailyCards  DailyCard[]
+  customCards CustomCard[]
+}
+
+model DailyCard {
+  id          String   @id @default(uuid())
+  title       String
+  teaser      String
+  clues       String[]
+  solution    String
+  theme       String
+  themeId     Int?
+  imageUrl    String?
+  likesCount  Int      @default(0)
+  viewsCount  Int      @default(0)
+  generatedAt DateTime @unique
+
+  themeRelation Theme? @relation(fields: [themeId], references: [id])
+  likes         Like[] @relation("DailyCardLikes")
+  views         View[] @relation("DailyCardViews")
+}
+
+model CustomCard {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  title      String
+  teaser     String
+  clues      String[]
+  solution   String
+  theme      String?
+  themeId    Int?
+  imageUrl   String?
+  prompt     String?
+  likesCount Int      @default(0)
+  viewsCount Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  themeRelation Theme? @relation(fields: [themeId], references: [id])
+  likes         Like[] @relation("CustomCardLikes")
+  views         View[] @relation("CustomCardViews")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  cardId    String
+  cardType  CardType
+  createdAt DateTime @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  dailyCard  DailyCard?  @relation("DailyCardLikes", fields: [cardId], references: [id], map: "like_daily_card_fkey")
+  customCard CustomCard? @relation("CustomCardLikes", fields: [cardId], references: [id], map: "like_custom_card_fkey")
+
+  @@unique([userId, cardId, cardType], name: "user_card_like")
+}
+
+model View {
+  id        String   @id @default(uuid())
+  userId    String
+  cardId    String
+  cardType  CardType
+  createdAt DateTime @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  dailyCard  DailyCard?  @relation("DailyCardViews", fields: [cardId], references: [id], map: "view_daily_card_fkey")
+  customCard CustomCard? @relation("CustomCardViews", fields: [cardId], references: [id], map: "view_custom_card_fkey")
+}
+
+enum CardType {
+  DAILY
+  CUSTOM
+}
