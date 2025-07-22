@@ -46,8 +46,6 @@ model DailyCard {
   generatedAt DateTime @unique
 
   themeRelation Theme? @relation(fields: [themeId], references: [id])
-  likes         Like[] @relation("DailyCardLikes")
-  views         View[] @relation("DailyCardViews")
 }
 
 model CustomCard {
@@ -67,8 +65,6 @@ model CustomCard {
   createdAt  DateTime @default(now())
 
   themeRelation Theme? @relation(fields: [themeId], references: [id])
-  likes         Like[] @relation("CustomCardLikes")
-  views         View[] @relation("CustomCardViews")
 }
 
 model Like {
@@ -78,9 +74,7 @@ model Like {
   cardType  CardType
   createdAt DateTime @default(now())
 
-  user       User        @relation(fields: [userId], references: [id])
-  dailyCard  DailyCard?  @relation("DailyCardLikes", fields: [cardId], references: [id], map: "like_daily_card_fkey")
-  customCard CustomCard? @relation("CustomCardLikes", fields: [cardId], references: [id], map: "like_custom_card_fkey")
+  user User @relation(fields: [userId], references: [id])
 
   @@unique([userId, cardId, cardType], name: "user_card_like")
 }
@@ -92,9 +86,7 @@ model View {
   cardType  CardType
   createdAt DateTime @default(now())
 
-  user       User        @relation(fields: [userId], references: [id])
-  dailyCard  DailyCard?  @relation("DailyCardViews", fields: [cardId], references: [id], map: "view_daily_card_fkey")
-  customCard CustomCard? @relation("CustomCardViews", fields: [cardId], references: [id], map: "view_custom_card_fkey")
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum CardType {

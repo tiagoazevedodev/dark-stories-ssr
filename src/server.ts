@@ -185,6 +185,14 @@ app.get('/card/:id', async (request, reply) => {
   const { id } = request.params as { id: string }
   
   try {
+    // Validar se o ID é válido (UUID)
+    if (!id || id.length < 10) {
+      return reply.code(400).view('error.ejs', { 
+        message: 'ID do card inválido',
+        user: request.session.user 
+      })
+    }
+
     // Buscar tanto em daily cards quanto custom cards
     let card = await prisma.dailyCard.findUnique({
       where: { id },
@@ -212,28 +220,33 @@ app.get('/card/:id', async (request, reply) => {
         user: request.session.user 
       })
     }
-    
-    // Registrar visualização
+
+    // Registrar visualização (apenas se usuário logado)
     if (request.session.userId) {
-      await prisma.view.create({
-        data: {
-          userId: request.session.userId,
-          cardId: id,
-          cardType: cardType as any
+      try {
+        await prisma.view.create({
+          data: {
+            userId: request.session.userId,
+            cardId: id,
+            cardType: cardType as any
+          }
+        })
+        
+        // Incrementar contador de views
+        if (cardType === 'DAILY') {
+          await prisma.dailyCard.update({
+            where: { id },
+            data: { viewsCount: { increment: 1 } }
+          })
+        } else {
+          await prisma.customCard.update({
+            where: { id },
+            data: { viewsCount: { increment: 1 } }
+          })
         }
-      })
-      
-      // Incrementar contador de views
-      if (cardType === 'DAILY') {
-        await prisma.dailyCard.update({
-          where: { id },
-          data: { viewsCount: { increment: 1 } }
-        })
-      } else {
-        await prisma.customCard.update({
-          where: { id },
-          data: { viewsCount: { increment: 1 } }
-        })
+      } catch (viewError) {
+        // Log do erro mas não falha a requisição
+        console.error('Erro ao registrar view:', viewError)
       }
     }
     
@@ -244,8 +257,9 @@ app.get('/card/:id', async (request, reply) => {
     })
     
   } catch (error) {
+    console.error('Erro na rota /card/:id:', error)
     return reply.code(500).view('error.ejs', { 
-      message: 'Erro interno do servidor',
+      message: 'Erro interno do servidor. Tente novamente mais tarde.',
       user: request.session.user 
     })
   }
@@ -257,63 +271,90 @@ app.post('/card/:id/like', { preHandler: requireAuth }, async (request, reply) =
   const { cardType } = request.body as { cardType: 'DAILY' | 'CUSTOM' }
   
   try {
+    // Validar cardType
+    if (!cardType || !['DAILY', 'CUSTOM'].includes(cardType)) {
+      return reply.code(400).view('error.ejs', { 
+        message: 'Tipo de card inválido',
+        user: request.session.user 
+      })
+    }
+
+    // Verificar se o card existe primeiro
+    let cardExists = false
+    if (cardType === 'DAILY') {
+      const dailyCard = await prisma.dailyCard.findUnique({ where: { id } })
+      cardExists = !!dailyCard
+    } else {
+      const customCard = await prisma.customCard.findUnique({ where: { id } })
+      cardExists = !!customCard
+    }
+
+    if (!cardExists) {
+      return reply.code(404).view('error.ejs', { 
+        message: 'Card não encontrado',
+        user: request.session.user 
+      })
+    }
+
     // Verificar se já curtiu
-    const existingLike = await prisma.like.findUnique({
+    const existingLike = await prisma.like.findFirst({
       where: {
-        user_card_like: {
-          userId: request.session.userId!,
-          cardId: id,
-          cardType
-        }
+        userId: request.session.userId!,
+        cardId: id,
+        cardType: cardType
       }
     })
     
     if (existingLike) {
-      // Remover like
-      await prisma.like.delete({
-        where: { id: existingLike.id }
-      })
-      
-      // Decrementar contador
-      if (cardType === 'DAILY') {
-        await prisma.dailyCard.update({
-          where: { id },
-          data: { likesCount: { decrement: 1 } }
+      // Remover like e decrementar contador em transação
+      await prisma.$transaction(async (tx) => {
+        await tx.like.delete({
+          where: { id: existingLike.id }
         })
-      } else {
-        await prisma.customCard.update({
-          where: { id },
-          data: { likesCount: { decrement: 1 } }
-        })
-      }
-    } else {
-      // Adicionar like
-      await prisma.like.create({
-        data: {
-          userId: request.session.userId!,
-          cardId: id,
-          cardType
+        
+        if (cardType === 'DAILY') {
+          await tx.dailyCard.update({
+            where: { id },
+            data: { likesCount: { decrement: 1 } }
+          })
+        } else {
+          await tx.customCard.update({
+            where: { id },
+            data: { likesCount: { decrement: 1 } }
+          })
         }
       })
-      
-      // Incrementar contador
-      if (cardType === 'DAILY') {
-        await prisma.dailyCard.update({
-          where: { id },
-          data: { likesCount: { increment: 1 } }
-        })
-      } else {
-        await prisma.customCard.update({
-          where: { id },
-          data: { likesCount: { increment: 1 } }
-        })
-      }
+    } else {
+      // Adicionar like e incrementar contador em transação
+      await prisma.$transaction(async (tx) => {
+        // Usar raw SQL para inserir sem constraint
+        await tx.$executeRaw`
+          INSERT INTO "Like" (id, "userId", "cardId", "cardType", "createdAt")
+          VALUES (gen_random_uuid(), ${request.session.userId!}::uuid, ${id}::uuid, ${cardType}::"CardType", NOW())
+        `
+        
+        if (cardType === 'DAILY') {
+          await tx.dailyCard.update({
+            where: { id },
+            data: { likesCount: { increment: 1 } }
+          })
+        } else {
+          await tx.customCard.update({
+            where: { id },
+            data: { likesCount: { increment: 1 } }
+          })
+        }
+      })
     }
     
     return reply.redirect(`/card/${id}`)
     
   } catch (error) {
-    return reply.code(500).send({ error: 'Erro ao processar like' })
+    console.error('Erro na rota /card/:id/like:', error)
+    return reply.code(500).view('error.ejs', { 
+      message: 'Erro ao processar like. Tente novamente mais tarde.',
+      user: request.session.user 
+    })
   }
 })
 
