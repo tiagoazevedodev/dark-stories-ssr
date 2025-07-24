@@ -358,6 +358,179 @@ app.post('/card/:id/like', { preHandler: requireAuth }, async (request, reply) =
   }
 })
 
+app.get('/card/:id/edit', { preHandler: requireAuth }, async (request, reply) => {
+  const { id } = request.params as { id: string }
+  
+  try {
+    // Buscar o card customizado
+    const card = await prisma.customCard.findUnique({ 
+      where: { id },
+      include: { themeRelation: true }
+    })
+    
+    if (!card) {
+      return reply.code(404).view('error.ejs', { 
+        message: 'Card não encontrado',
+        user: request.session.user 
+      })
+    }
+    
+    // Verificar se o usuário é o dono do card
+    if (card.userId !== request.session.userId) {
+      return reply.code(403).view('error.ejs', { 
+        message: 'Você não tem permissão para editar este card',
+        user: request.session.user 
+      })
+    }
+    
+    // Buscar temas disponíveis
+    const themes = await prisma.theme.findMany({
+      orderBy: { name: 'asc' }
+    })
+    
+    return reply.view('card/edit.ejs', { 
+      card, 
+      themes,
+      user: request.session.user,
+      error: null
+    })
+    
+  } catch (error) {
+    console.error('Erro na rota /card/:id/edit:', error)
+    return reply.code(500).view('error.ejs', { 
+      message: 'Erro ao carregar página de edição',
+      user: request.session.user 
+    })
+  }
+})
+
+// Deletar card customizado
+app.delete('/card/:id', { preHandler: requireAuth }, async (request, reply) => {
+  const { id } = request.params as { id: string }
+  
+  try {
+    // Buscar o card customizado
+    const card = await prisma.customCard.findUnique({ where: { id } })
+    
+    if (!card) {
+      return reply.code(404).view('error.ejs', {
+        message: 'Card não encontrado',
+        user: request.session.user
+      })
+    }
+    
+    // Verificar se o usuário é o dono do card
+    if (card.userId !== request.session.userId) {
+      return reply.code(403).view('error.ejs', {
+        message: 'Você não tem permissão para excluir este card',
+        user: request.session.user
+      })
+    }
+    
+    // Deletar o card e todas as referências relacionadas em uma transação
+    await prisma.$transaction(async (tx) => {
+      // Deletar likes relacionados ao card
+      await tx.like.deleteMany({
+        where: {
+          cardId: id,
+          cardType: 'CUSTOM'
+        }
+      })
+      
+      // Deletar views relacionadas ao card
+      await tx.view.deleteMany({
+        where: {
+          cardId: id,
+          cardType: 'CUSTOM'
+        }
+      })
+      
+      // Deletar o card
+      await tx.customCard.delete({
+        where: { id }
+      })
+    })
+    
+    return reply.redirect('/dashboard')
+    
+  } catch (error) {
+    console.error('Erro ao deletar card:', error)
+    return reply.code(500).view('error.ejs', {
+      message: 'Erro ao excluir card. Tente novamente.',
+      user: request.session.user
+    })
+  }
+})
+
+// Rota alternativa para suportar método POST com _method=DELETE (para formulários HTML)
+app.post('/card/:id', { preHandler: requireAuth }, async (request, reply) => {
+  const { _method } = request.query as { _method?: string }
+  
+  if (_method === 'DELETE') {
+    // Redirecionar para a rota DELETE
+    const { id } = request.params as { id: string }
+    
+    try {
+      // Buscar o card customizado
+      const card = await prisma.customCard.findUnique({ where: { id } })
+      
+      if (!card) {
+        return reply.code(404).view('error.ejs', {
+          message: 'Card não encontrado',
+          user: request.session.user
+        })
+      }
+      
+      // Verificar se o usuário é o dono do card
+      if (card.userId !== request.session.userId) {
+        return reply.code(403).view('error.ejs', {
+          message: 'Você não tem permissão para excluir este card',
+          user: request.session.user
+        })
+      }
+      
+      // Deletar o card e todas as referências relacionadas em uma transação
+      await prisma.$transaction(async (tx) => {
+        // Deletar likes relacionados ao card
+        await tx.like.deleteMany({
+          where: {
+            cardId: id,
+            cardType: 'CUSTOM'
+          }
+        })
+        
+        // Deletar views relacionadas ao card
+        await tx.view.deleteMany({
+          where: {
+            cardId: id,
+            cardType: 'CUSTOM'
+          }
+        })
+        
+        // Deletar o card
+        await tx.customCard.delete({
+          where: { id }
+        })
+      })
+      
+      return reply.redirect('/dashboard')
+      
+    } catch (error) {
+      console.error('Erro ao deletar card:', error)
+      return reply.code(500).view('error.ejs', {
+        message: 'Erro ao excluir card. Tente novamente.',
+        user: request.session.user
+      })
+    }
+  }
+  
+  // Se não for DELETE, retornar erro
+  return reply.code(405).view('error.ejs', {
+    message: 'Método não permitido',
+    user: request.session.user
+  })
+})
+
 // =============================================================================
 // ROTAS PROTEGIDAS (REQUEREM LOGIN)
 // =============================================================================
@@ -398,6 +571,110 @@ app.get('/dashboard', { preHandler: requireAuth }, async (request, reply) => {
 // =============================================================================
 // ROTAS PREMIUM (REQUEREM ASSINATURA)
 // =============================================================================
+
+// Editar card customizado
+app.post('/card/:id/edit', { preHandler: requireAuth }, async (request, reply) => {
+  const { id } = request.params as { id: string }
+  const { title, teaser, clues, solution, themeId, prompt } = request.body as {
+    title: string
+    teaser: string
+    clues: string
+    solution: string
+    themeId: string
+    prompt: string
+  }
+
+  try {
+    // Buscar o card customizado
+    const card = await prisma.customCard.findUnique({ where: { id } })
+    
+    if (!card) {
+      return reply.code(404).view('error.ejs', {
+        message: 'Card não encontrado',
+        user: request.session.user
+      })
+    }
+    
+    // Verificar se o usuário é o dono do card
+    if (card.userId !== request.session.userId) {
+      return reply.code(403).view('error.ejs', {
+        message: 'Você não tem permissão para editar este card',
+        user: request.session.user
+      })
+    }
+    
+    // Validar dados obrigatórios
+    if (!title || !teaser || !clues || !solution) {
+      const themes = await prisma.theme.findMany({
+        orderBy: { name: 'asc' }
+      })
+      
+      return reply.view('card/edit.ejs', {
+        card,
+        themes,
+        user: request.session.user,
+        error: 'Todos os campos são obrigatórios'
+      })
+    }
+    
+    // Parse clues (assumindo que vem como texto separado por quebras de linha)
+    const cluesArray = clues.split('\n').filter(clue => clue.trim().length > 0)
+    
+    if (cluesArray.length === 0) {
+      const themes = await prisma.theme.findMany({
+        orderBy: { name: 'asc' }
+      })
+      
+      return reply.view('card/edit.ejs', {
+        card,
+        themes,
+        user: request.session.user,
+        error: 'Pelo menos uma pista é necessária'
+      })
+    }
+    
+    // Atualizar o card
+    const updatedCard = await prisma.customCard.update({
+      where: { id },
+      data: {
+        title,
+        teaser,
+        clues: cluesArray,
+        solution,
+        themeId: themeId ? parseInt(themeId) : null,
+        prompt
+      }
+    })
+    
+    return reply.redirect(`/card/${updatedCard.id}`)
+    
+  } catch (error) {
+    console.error('Erro ao editar card:', error)
+    
+    try {
+      const themes = await prisma.theme.findMany({
+        orderBy: { name: 'asc' }
+      })
+      
+      const card = await prisma.customCard.findUnique({ 
+        where: { id },
+        include: { themeRelation: true }
+      })
+      
+      return reply.view('card/edit.ejs', {
+        card,
+        themes,
+        user: request.session.user,
+        error: 'Erro ao salvar alterações. Tente novamente.'
+      })
+    } catch (fallbackError) {
+      return reply.code(500).view('error.ejs', {
+        message: 'Erro interno do servidor',
+        user: request.session.user
+      })
+    }
+  }
+})
 
 // Histórico de cards (premium)
 app.get('/history', { preHandler: requirePremium }, async (request, reply) => {
