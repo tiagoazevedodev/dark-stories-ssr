@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Black Stories</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <a href="/" class="text-2xl font-bold text-purple-400">
+              <i class="fas fa-mask mr-2"></i>Black Stories
+            </a>
+          </div>
+          <div class="flex items-center space-x-4">
+            <a
+              href="/"
+              class="text-gray-300 hover:text-white px-3 py-2 rounded-md"
+            >
+              <i class="fas fa-home mr-2"></i>Início
+            </a>
+            <% if (user.isSubscriber) { %>
+            <a
+              href="/history"
+              class="text-purple-400 hover:text-purple-300 px-3 py-2 rounded-md"
+            >
+              <i class="fas fa-history mr-2"></i>Histórico
+            </a>
+            <a
+              href="/create"
+              class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md"
+            >
+              <i class="fas fa-plus mr-2"></i>Criar
+            </a>
+            <% } else { %>
+            <a
+              href="/premium"
+              class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-md"
+            >
+              <i class="fas fa-crown mr-2"></i>Premium
+            </a>
+            <% } %>
+            <form action="/logout" method="POST" class="inline">
+              <button
+                type="submit"
+                class="text-gray-300 hover:text-white px-3 py-2 rounded-md"
+              >
+                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- Welcome Section -->
+      <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          Olá, <%= dashboardUser.name %>! 👋
+        </h1>
+        <p class="text-gray-400">
+          Bem-vindo ao seu dashboard pessoal de Black Stories.
+        </p>
+      </div>
+
+      <!-- Status Cards -->
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <!-- Subscription Status -->
+        <div class="bg-gray-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Status da Conta</h3>
+            <% if (dashboardUser.isSubscriber) { %>
+            <i class="fas fa-crown text-yellow-400 text-2xl"></i>
+            <% } else { %>
+            <i class="fas fa-user text-gray-400 text-2xl"></i>
+            <% } %>
+          </div>
+          <% if (dashboardUser.isSubscriber) { %>
+          <div class="text-yellow-400 font-medium mb-2">
+            <i class="fas fa-check-circle mr-2"></i>Premium Ativo
+          </div>
+          <p class="text-sm text-gray-400">
+            Acesso completo a todas as funcionalidades
+          </p>
+          <% if (dashboardUser.subscriptionExpiresAt) { %>
+          <p class="text-xs text-gray-500 mt-2">
+            Expira em: <%= new
+            Date(dashboardUser.subscriptionExpiresAt).toLocaleDateString('pt-BR')
+            %>
+          </p>
+          <% } %> <% } else { %>
+          <div class="text-gray-400 font-medium mb-2">
+            <i class="fas fa-times-circle mr-2"></i>Conta Gratuita
+          </div>
+          <p class="text-sm text-gray-400 mb-4">
+            Acesso limitado às funcionalidades
+          </p>
+          <a
+            href="/premium"
+            class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <i class="fas fa-arrow-up mr-2"></i>Fazer Upgrade
+          </a>
+          <% } %>
+        </div>
+
+        <!-- My Cards -->
+        <div class="bg-gray-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Meus Cards</h3>
+            <i class="fas fa-cards text-purple-400 text-2xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-purple-400 mb-2">
+            <%= dashboardUser.customCards.length %>
+          </div>
+          <p class="text-sm text-gray-400">Cards personalizados criados</p>
+          <% if (dashboardUser.isSubscriber) { %>
+          <a
+            href="/create"
+            class="inline-block mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <i class="fas fa-plus mr-2"></i>Criar Novo
+          </a>
+          <% } %>
+        </div>
+
+        <!-- Activity Stats -->
+        <div class="bg-gray-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Atividade</h3>
+            <i class="fas fa-chart-line text-green-400 text-2xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-green-400 mb-2">
+            <%= dashboardUser.likes.length %>
+          </div>
+          <p class="text-sm text-gray-400">Cards curtidos</p>
+        </div>
+      </div>
+
+      <!-- My Custom Cards -->
+      <% if (dashboardUser.customCards.length > 0) { %>
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold">Meus Cards Personalizados</h2>
+          <% if (dashboardUser.isSubscriber) { %>
+          <a
+            href="/create"
+            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+          >
+            <i class="fas fa-plus mr-2"></i>Criar Novo
+          </a>
+          <% } %>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% dashboardUser.customCards.forEach(card => { %>
+          <div
+            class="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-700 transition-colors"
+          >
+            <% if (card.imageUrl) { %>
+            <div
+              class="h-48 bg-cover bg-center"
+              style="background-image: url('<%= card.imageUrl %>')"
+            ></div>
+            <% } else { %>
+            <div
+              class="h-48 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center"
+            >
+              <i class="fas fa-image text-white text-4xl opacity-50"></i>
+            </div>
+            <% } %>
+
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <% if (card.theme) { %>
+                <span class="bg-purple-600 text-xs px-2 py-1 rounded-full">
+                  <%= card.theme.name %>
+                </span>
+                <% } %>
+                <span class="text-xs text-gray-400">
+                  <%= new Date(card.createdAt).toLocaleDateString('pt-BR') %>
+                </span>
+              </div>
+
+              <h3 class="font-semibold mb-2 line-clamp-2"><%= card.title %></h3>
+
+              <p class="text-sm text-gray-400 mb-4 line-clamp-2">
+                <%= card.teaser %>
+              </p>
+
+              <!-- Stats Section -->
+              <div
+                class="flex items-center space-x-4 text-xs text-gray-400 mb-4"
+              >
+                <span class="flex items-center">
+                  <i class="fas fa-heart mr-1"></i><%= card.likesCount %>
+                </span>
+                <span class="flex items-center">
+                  <i class="fas fa-eye mr-1"></i><%= card.viewsCount %>
+                </span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <!-- Primary Action - View -->
+                <a
+                  href="/card/<%= card.id %>"
+                  class="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg"
+                >
+                  <i class="fas fa-eye mr-2"></i>Ver Card
+                </a>
+
+                <!-- Secondary Actions Container -->
+                <div class="flex gap-2">
+                  <!-- Edit Button -->
+                  <a
+                    href="/card/<%= card.id %>/edit"
+                    class="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg w-10 h-10"
+                    title="Editar card"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+
+                  <!-- Delete Button -->
+                  <button
+                    type="submit"
+                    form="delete-form-<%= card.id %>"
+                    onclick="return confirm('Tem certeza que deseja excluir este card?')"
+                    class="flex items-center justify-center bg-gray-700 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg w-10 h-10"
+                    title="Excluir card"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+
+                  <!-- Hidden form for delete action -->
+                  <form
+                    id="delete-form-<%= card.id %>"
+                    action="/card/<%= card.id %>?_method=DELETE"
+                    method="POST"
+                    style="display: none;"
+                  ></form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Quick Actions -->
+      <div class="bg-gray-800 rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-6">Ações Rápidas</h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <a
+            href="/"
+            class="bg-purple-600 hover:bg-purple-700 p-4 rounded-lg text-center transition-colors"
+          >
+            <i class="fas fa-home text-2xl mb-2"></i>
+            <div class="font-medium">Card Diário</div>
+            <div class="text-sm text-gray-300">Ver card de hoje</div>
+          </a>
+
+          <% if (dashboardUser.isSubscriber) { %>
+          <a
+            href="/history"
+            class="bg-blue-600 hover:bg-blue-700 p-4 rounded-lg text-center transition-colors"
+          >
+            <i class="fas fa-history text-2xl mb-2"></i>
+            <div class="font-medium">Histórico</div>
+            <div class="text-sm text-gray-300">Ver todos os cards</div>
+          </a>
+
+          <a
+            href="/create"
+            class="bg-green-600 hover:bg-green-700 p-4 rounded-lg text-center transition-colors"
+          >
+            <i class="fas fa-plus text-2xl mb-2"></i>
+            <div class="font-medium">Criar Card</div>
+            <div class="text-sm text-gray-300">Story personalizada</div>
+          </a>
+          <% } else { %>
+          <a
+            href="/premium"
+            class="bg-yellow-600 hover:bg-yellow-700 p-4 rounded-lg text-center transition-colors"
+          >
+            <i class="fas fa-crown text-2xl mb-2"></i>
+            <div class="font-medium">Premium</div>
+            <div class="text-sm text-gray-300">Desbloquear tudo</div>
+          </a>
+          <% } %> <% if (dashboardUser.isSubscriber) { %>
+          <form action="/cancel-subscription" method="POST" class="contents">
+            <button
+              type="submit"
+              onclick="return confirm('Tem certeza que deseja cancelar sua assinatura?')"
+              class="bg-red-600 hover:bg-red-700 p-4 rounded-lg text-center transition-colors"
+            >
+              <i class="fas fa-times text-2xl mb-2"></i>
+              <div class="font-medium">Cancelar</div>
+              <div class="text-sm text-gray-300">Assinatura</div>
+            </button>
+          </form>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

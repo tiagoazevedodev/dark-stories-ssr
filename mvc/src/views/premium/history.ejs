@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - Black Stories</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-mask mr-2"></i>Black Stories
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-dashboard mr-2"></i>Dashboard
+                    </a>
+                    <a href="/create" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                        <i class="fas fa-plus mr-2"></i>Criar
+                    </a>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-crown text-yellow-400 mr-2"></i>
+                    <span class="text-sm text-yellow-400">Recurso Premium</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold">
+                    Histórico Completo
+                </h1>
+                <p class="text-gray-400 mt-2">
+                    Acesse todas as Black Stories já criadas. Resolva mistérios do passado!
+                </p>
+            </div>
+            
+            <div class="hidden md:flex items-center text-center">
+                <div class="bg-gray-800 rounded-xl p-4">
+                    <div class="text-2xl font-bold text-purple-400"><%= cards.length %></div>
+                    <div class="text-sm text-gray-400">Stories nesta página</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <% if (cards.length > 0) { %>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <% cards.forEach(card => { %>
+            <div class="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-700 transition-colors group">
+                <% if (card.imageUrl) { %>
+                <div class="h-48 bg-cover bg-center relative" style="background-image: url('<%= card.imageUrl %>')">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-20 transition-all"></div>
+                </div>
+                <% } else { %>
+                <div class="h-48 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center relative">
+                    <i class="fas fa-image text-white text-4xl opacity-50"></i>
+                    <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-0 transition-all"></div>
+                </div>
+                <% } %>
+                
+                <div class="p-6">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-day text-purple-400 mr-2"></i>
+                            <span class="text-xs text-gray-400">
+                                <%= new Date(card.generatedAt).toLocaleDateString('pt-BR') %>
+                            </span>
+                        </div>
+                        <% if (card.theme) { %>
+                        <span class="bg-purple-600 text-xs px-2 py-1 rounded-full">
+                            <%= card.theme.name %>
+                        </span>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="font-bold text-lg mb-3 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                        <%= card.title %>
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-3">
+                        <%= card.teaser %>
+                    </p>
+                    
+                    <!-- Stats and Action -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3 text-xs text-gray-400">
+                            <span>
+                                <i class="fas fa-heart mr-1"></i><%= card.likesCount %>
+                            </span>
+                            <span>
+                                <i class="fas fa-eye mr-1"></i><%= card.viewsCount %>
+                            </span>
+                        </div>
+                        <a href="/card/<%= card.id %>" 
+                           class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-play mr-2"></i>Resolver
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+        <div class="flex items-center justify-center space-x-2">
+            <% if (currentPage > 1) { %>
+            <a href="/history?page=<%= currentPage - 1 %>" 
+               class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-chevron-left mr-2"></i>Anterior
+            </a>
+            <% } %>
+            
+            <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                <% if (i === currentPage) { %>
+                <span class="bg-purple-600 px-4 py-2 rounded-lg font-bold">
+                    <%= i %>
+                </span>
+                <% } else { %>
+                <a href="/history?page=<%= i %>" 
+                   class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                    <%= i %>
+                </a>
+                <% } %>
+            <% } %>
+            
+            <% if (currentPage < totalPages) { %>
+            <a href="/history?page=<%= currentPage + 1 %>" 
+               class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                Próximo<i class="fas fa-chevron-right ml-2"></i>
+            </a>
+            <% } %>
+        </div>
+        
+        <div class="text-center mt-4 text-sm text-gray-400">
+            Página <%= currentPage %> de <%= totalPages %>
+        </div>
+        <% } %>
+
+        <% } else { %>
+        <!-- Empty State -->
+        <div class="text-center py-16">
+            <div class="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-history text-3xl text-gray-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Nenhuma história encontrada</h3>
+            <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                Parece que ainda não temos Black Stories criadas. 
+                Volte mais tarde para descobrir novos mistérios!
+            </p>
+            <a href="/" class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg transition-colors">
+                <i class="fas fa-home mr-2"></i>Voltar ao Início
+            </a>
+        </div>
+        <% } %>
+
+        <!-- Call to Action -->
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-center mt-12">
+            <h3 class="text-2xl font-bold mb-4">Crie sua própria Black Story!</h3>
+            <p class="text-lg mb-6 opacity-90">
+                Como usuário Premium, você pode criar histórias misteriosas personalizadas com temas únicos.
+            </p>
+            <a href="/create" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                <i class="fas fa-wand-magic-sparkles mr-2"></i>Criar Agora
+            </a>
+        </div>
+    </main>
+</body>
+</html> 

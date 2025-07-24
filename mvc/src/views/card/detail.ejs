@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= card.title %> - Black Stories</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-mask mr-2"></i>Black Stories
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <% if (user) { %>
+                        <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-dashboard mr-2"></i>Dashboard
+                        </a>
+                        <% if (user.isSubscriber) { %>
+                            <a href="/history" class="text-purple-400 hover:text-purple-300 px-3 py-2 rounded-md">
+                                <i class="fas fa-history mr-2"></i>Histórico
+                            </a>
+                            <a href="/create" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                                <i class="fas fa-plus mr-2"></i>Criar
+                            </a>
+                        <% } %>
+                        <form action="/logout" method="POST" class="inline">
+                            <button type="submit" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <a href="/login" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                        </a>
+                        <a href="/register" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                            <i class="fas fa-user-plus mr-2"></i>Cadastrar
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="/" class="text-gray-400 hover:text-white inline-flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar ao início
+            </a>
+        </div>
+
+        <!-- Card Header -->
+        <div class="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-<%= cardType === 'DAILY' ? 'calendar-day' : 'user' %> text-purple-400 mr-2"></i>
+                            <span class="text-sm text-gray-400">
+                                <%= cardType === 'DAILY' ? 'Card Diário' : 'Card Personalizado' %>
+                                <% if (cardType === 'CUSTOM' && card.user) { %>
+                                - por <%= card.user.name %>
+                                <% } %>
+                            </span>
+                        </div>
+                        <% if (card.theme) { %>
+                        <span class="bg-purple-600 text-xs px-2 py-1 rounded-full">
+                            <%= card.theme.name %>
+                        </span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <% if (user) { %>
+                        <form action="/card/<%= card.id %>/like" method="POST" class="inline">
+                            <input type="hidden" name="cardType" value="<%= cardType %>">
+                            <button type="submit" class="text-gray-400 hover:text-red-400 transition-colors">
+                                <i class="fas fa-heart mr-1"></i><%= card.likesCount %>
+                            </button>
+                        </form>
+                        <% } else { %>
+                        <span class="text-gray-400">
+                            <i class="fas fa-heart mr-1"></i><%= card.likesCount %>
+                        </span>
+                        <% } %>
+                        <span class="text-gray-400">
+                            <i class="fas fa-eye mr-1"></i><%= card.viewsCount %>
+                        </span>
+                    </div>
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold mb-6 text-white">
+                    <%= card.title %>
+                </h1>
+
+                <% if (card.imageUrl) { %>
+                <div class="mb-8">
+                    <img src="<%= card.imageUrl %>" alt="<%= card.title %>" 
+                         class="w-full h-96 object-cover rounded-lg shadow-lg">
+                </div>
+                <% } %>
+
+                <!-- Mystery Game Interface -->
+                <div class="space-y-8">
+                    <!-- Teaser/Initial Story -->
+                    <div class="bg-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 text-purple-400">
+                            <i class="fas fa-scroll mr-2"></i>A História
+                        </h2>
+                        <p class="text-lg leading-relaxed text-gray-300">
+                            <%= card.teaser %>
+                        </p>
+                    </div>
+
+                    <!-- Clues Section -->
+                    <div class="bg-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 text-purple-400">
+                            <i class="fas fa-lightbulb mr-2"></i>Pistas
+                        </h2>
+                        <p class="text-sm text-gray-400 mb-4">
+                            Clique nas pistas abaixo para revelar informações adicionais que podem ajudar a resolver o mistério.
+                        </p>
+                        
+                        <div class="space-y-3">
+                            <% card.clues.forEach((clue, index) => { %>
+                            <div class="bg-gray-800 rounded-lg">
+                                <button onclick="toggleClue(<%= index %>)" 
+                                        class="w-full text-left p-4 hover:bg-gray-600 transition-colors rounded-lg">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-medium">Pista #<%= index + 1 %></span>
+                                        <i class="fas fa-chevron-down transform transition-transform" id="chevron-<%= index %>"></i>
+                                    </div>
+                                </button>
+                                <div class="hidden p-4 pt-0" id="clue-<%= index %>">
+                                    <p class="text-gray-300 border-l-4 border-purple-400 pl-4">
+                                        <%= clue %>
+                                    </p>
+                                </div>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <!-- Solution Section -->
+                    <div class="bg-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 text-purple-400">
+                            <i class="fas fa-key mr-2"></i>Solução
+                        </h2>
+                        <p class="text-sm text-gray-400 mb-4">
+                            Clique abaixo para revelar a solução do mistério. Tente resolver antes de olhar!
+                        </p>
+                        
+                        <div class="bg-gray-800 rounded-lg">
+                            <button onclick="toggleSolution()" 
+                                    class="w-full text-left p-4 hover:bg-gray-600 transition-colors rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-yellow-400">
+                                        <i class="fas fa-unlock mr-2"></i>Revelar Solução
+                                    </span>
+                                    <i class="fas fa-chevron-down transform transition-transform" id="solution-chevron"></i>
+                                </div>
+                            </button>
+                            <div class="hidden p-4 pt-0" id="solution-content">
+                                <div class="border-l-4 border-yellow-400 pl-4">
+                                    <p class="text-gray-300 leading-relaxed">
+                                        <%= card.solution %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                    <a href="/" class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-home mr-2"></i>Voltar ao Início
+                    </a>
+                    <% if (user && user.isSubscriber) { %>
+                    <a href="/history" class="bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-history mr-2"></i>Ver Histórico
+                    </a>
+                    <a href="/create" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Criar Meu Card
+                    </a>
+                    <% } else if (user) { %>
+                    <a href="/premium" class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-crown mr-2"></i>Upgrade Premium
+                    </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleClue(index) {
+            const clueContent = document.getElementById(`clue-${index}`);
+            const chevron = document.getElementById(`chevron-${index}`);
+            
+            if (clueContent.classList.contains('hidden')) {
+                clueContent.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                clueContent.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleSolution() {
+            const solutionContent = document.getElementById('solution-content');
+            const chevron = document.getElementById('solution-chevron');
+            
+            if (solutionContent.classList.contains('hidden')) {
+                solutionContent.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                solutionContent.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+    </script>
+</body>
+</html> 

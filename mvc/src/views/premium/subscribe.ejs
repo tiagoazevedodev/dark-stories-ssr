@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium - Black Stories</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-purple-400">
+                        <i class="fas fa-mask mr-2"></i>Black Stories
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <% if (user) { %>
+                        <a href="/dashboard" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-dashboard mr-2"></i>Dashboard
+                        </a>
+                        <form action="/logout" method="POST" class="inline">
+                            <button type="submit" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <a href="/login" class="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                        </a>
+                        <a href="/register" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md">
+                            <i class="fas fa-user-plus mr-2"></i>Cadastrar
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-yellow-500 rounded-full mb-6">
+                <i class="fas fa-crown text-3xl text-white"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                <span class="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                    Black Stories Premium
+                </span>
+            </h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                Desbloqueie todo o potencial do Black Stories. Acesse histórias ilimitadas, 
+                crie seus próprios mistérios e tenha acesso ao arquivo completo.
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-gray-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-history text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Histórico Completo</h3>
+                <p class="text-gray-400">
+                    Acesse todas as Black Stories já criadas. Mais de 100+ histórias únicas 
+                    geradas por IA para você resolver.
+                </p>
+            </div>
+
+            <div class="bg-gray-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-wand-magic-sparkles text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Criação Personalizada</h3>
+                <p class="text-gray-400">
+                    Crie suas próprias Black Stories com temas personalizados. 
+                    Terror, suspense, comédia - você escolhe!
+                </p>
+            </div>
+
+            <div class="bg-gray-800 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-palette text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Imagens com IA</h3>
+                <p class="text-gray-400">
+                    Cada história personalizada vem com uma imagem única 
+                    gerada por inteligência artificial.
+                </p>
+            </div>
+        </div>
+
+        <!-- Pricing Card -->
+        <div class="max-w-md mx-auto">
+            <div class="bg-gradient-to-b from-yellow-500 to-orange-500 rounded-2xl p-8 text-center relative overflow-hidden">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                        Melhor Valor
+                    </span>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold text-white mb-2">Premium Mensal</h3>
+                    <div class="text-5xl font-bold text-white mb-2">
+                        $1.99
+                        <span class="text-lg font-normal">/mês</span>
+                    </div>
+                    <p class="text-yellow-100">
+                        Cancele a qualquer momento
+                    </p>
+                </div>
+
+                <div class="space-y-3 mb-8">
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-check text-green-300 mr-3"></i>
+                        Histórico completo de stories
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-check text-green-300 mr-3"></i>
+                        Criação ilimitada de cards
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-check text-green-300 mr-3"></i>
+                        Imagens geradas por IA
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-check text-green-300 mr-3"></i>
+                        Temas personalizados
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-check text-green-300 mr-3"></i>
+                        Sem anúncios
+                    </div>
+                </div>
+
+                <% if (user) { %>
+                    <% if (user.isSubscriber) { %>
+                        <div class="bg-white text-green-600 px-8 py-3 rounded-lg font-bold">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Já é Premium!
+                        </div>
+                    <% } else { %>
+                        <form action="/subscribe" method="POST">
+                            <button 
+                                type="submit"     
+                                class="w-full bg-white text-orange-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                                style="background-color: white; color: #ea580c;"
+                            >
+                                <i class="fas fa-crown mr-2"></i>
+                                Assinar Agora
+                            </button>
+                        </form>
+                    <% } %>
+                <% } else { %>
+                    <a href="/register" 
+                       class="block w-full bg-white text-orange-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Criar Conta e Assinar
+                    </a>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="mt-16">
+            <h2 class="text-3xl font-bold text-center mb-8">Perguntas Frequentes</h2>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="bg-gray-800 rounded-lg">
+                    <button onclick="toggleFAQ(0)" class="w-full text-left p-6 hover:bg-gray-700 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">Como funciona a geração de IA?</span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="faq-chevron-0"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-6 pb-6" id="faq-content-0">
+                        <p class="text-gray-400">
+                            Utilizamos modelos avançados de IA para criar histórias únicas e envolventes. 
+                            Cada Black Story é gerada com base em temas e prompts específicos, 
+                            garantindo originalidade e qualidade.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg">
+                    <button onclick="toggleFAQ(1)" class="w-full text-left p-6 hover:bg-gray-700 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">Posso cancelar a qualquer momento?</span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="faq-chevron-1"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-6 pb-6" id="faq-content-1">
+                        <p class="text-gray-400">
+                            Sim! Você pode cancelar sua assinatura a qualquer momento através do seu dashboard. 
+                            Não há taxas de cancelamento ou períodos mínimos de contrato.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg">
+                    <button onclick="toggleFAQ(2)" class="w-full text-left p-6 hover:bg-gray-700 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">Quantas histórias posso criar?</span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="faq-chevron-2"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-6 pb-6" id="faq-content-2">
+                        <p class="text-gray-400">
+                            Com o plano Premium, você tem criações ilimitadas! 
+                            Crie quantas Black Stories personalizadas quiser, com seus temas favoritos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Free -->
+        <div class="text-center mt-12">
+            <a href="/" class="text-gray-400 hover:text-white">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Continuar com a versão gratuita
+            </a>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleFAQ(index) {
+            const content = document.getElementById(`faq-content-${index}`);
+            const chevron = document.getElementById(`faq-chevron-${index}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+    </script>
+</body>
+</html> 
