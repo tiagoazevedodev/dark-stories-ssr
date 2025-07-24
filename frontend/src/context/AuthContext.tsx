@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('@dark-stories/token');
     const savedUser = localStorage.getItem('user');
 
     if (token && savedUser) {
@@ -41,12 +41,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.setItem('user', JSON.stringify(user));
         }).catch(() => {
           // Token is invalid
-          localStorage.removeItem('token');
+          localStorage.removeItem('@dark-stories/token');
           localStorage.removeItem('user');
           setUser(null);
         });
       } catch (error) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('@dark-stories/token');
         localStorage.removeItem('user');
       }
     }
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authAPI.login(email, password);
       setUser(response.user);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('@dark-stories/token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
     } catch (error) {
       throw error;
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authAPI.register(name, email, password);
       setUser(response.user);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('@dark-stories/token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
     } catch (error) {
       throw error;
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem('@dark-stories/token');
     localStorage.removeItem('user');
   };
 
