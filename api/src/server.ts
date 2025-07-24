@@ -253,6 +253,90 @@ app.get('/api/cards/custom/:id', async (request, reply) => {
   }
 })
 
+app.put('/api/cards/custom/:id', {
+  preHandler: [app.authenticate]
+}, async (request, reply) => {
+  const { id } = request.params as { id: string }
+  const { title, teaser, clues, solution, theme, themeId } = request.body as {
+    title: string
+    teaser: string
+    clues: string[]
+    solution: string
+    theme?: string
+    themeId?: number
+  }
+
+  try {
+    // Check if the card exists and belongs to the user
+    const existingCard = await prisma.customCard.findFirst({
+      where: {
+        id,
+        userId: request.user.userId
+      }
+    })
+
+    if (!existingCard) {
+      return reply.code(404).send({ error: 'Card not found or you do not have permission to edit it' })
+    }
+
+    // Update the card
+    const updatedCard = await prisma.customCard.update({
+      where: { id },
+      data: {
+        title,
+        teaser,
+        clues,
+        solution,
+        theme,
+        themeId
+      },
+      include: { themeRelation: true }
+    })
+
+    return reply.send({ card: updatedCard })
+  } catch (error) {
+    return reply.code(500).send({ error: 'Failed to update card' })
+  }
+})
+
+app.delete('/api/cards/custom/:id', {
+  preHandler: [app.authenticate]
+}, async (request, reply) => {
+  const { id } = request.params as { id: string }
+
+  try {
+    // Check if the card exists and belongs to the user
+    const existingCard = await prisma.customCard.findFirst({
+      where: {
+        id,
+        userId: request.user.userId
+      }
+    })
+
+    if (!existingCard) {
+      return reply.code(404).send({ error: 'Card not found or you do not have permission to delete it' })
+    }
+
+    // Delete related likes and views first
+    await prisma.like.deleteMany({
+      where: { cardId: id, cardType: 'CUSTOM' }
+    })
+
+    await prisma.view.deleteMany({
+      where: { cardId: id, cardType: 'CUSTOM' }
+    })
+
+    // Delete the card
+    await prisma.customCard.delete({
+      where: { id }
+    })
+
+    return reply.send({ message: 'Card deleted successfully' })
+  } catch (error) {
+    return reply.code(500).send({ error: 'Failed to delete card' })
+  }
+})
+
 // =============================================================================
 // THEMES ROUTES
 // =============================================================================
