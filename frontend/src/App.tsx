@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CardDetail from './pages/CardDetail';
 import CreateCard from './pages/CreateCard';
+import EditCard from './pages/EditCard';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -62,6 +63,11 @@ const AppContent: React.FC = () => {
           <Route path="/create-card" element={
             <ProtectedRoute>
               <CreateCard />
+            </ProtectedRoute>
+          } />
+          <Route path="/edit-card/:id" element={
+            <ProtectedRoute>
+              <EditCard />
             </ProtectedRoute>
           } />
           <Route path="/card/:id" element={<CardDetail />} />

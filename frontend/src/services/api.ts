@@ -85,6 +85,23 @@ export const cardsAPI = {
     return response.data;
   },
 
+  updateCustomCard: async (id: string, card: {
+    title: string;
+    teaser: string;
+    clues: string[];
+    solution: string;
+    theme?: string;
+    themeId?: number;
+  }): Promise<{ card: CustomCard }> => {
+    const response = await api.put(`/api/cards/custom/${id}`, card);
+    return response.data;
+  },
+
+  deleteCustomCard: async (id: string): Promise<{ message: string }> => {
+    const response = await api.delete(`/api/cards/custom/${id}`);
+    return response.data;
+  },
+
   likeCard: async (cardId: string, cardType: CardType): Promise<{ liked: boolean }> => {
     const response = await api.post(`/api/cards/${cardId}/like`, { cardType });
     return response.data;

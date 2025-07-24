@@ -114,9 +114,12 @@ const Dashboard: React.FC = () => {
                 >
                   View
                 </Link>
-                <button className="flex-1 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                <Link
+                  to={`/edit-card/${card.id}`}
+                  className="flex-1 text-center py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
                   Edit
-                </button>
+                </Link>
               </div>
             </div>
           ))}
