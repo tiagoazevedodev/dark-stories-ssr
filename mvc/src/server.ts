@@ -774,6 +774,78 @@ app.post('/create', { preHandler: requirePremium }, async (request, reply) => {
   }
 })
 
+// ================================
+// ROTA PARA CRIAR NOVO TEMA
+// ================================
+app.post('/theme/create', { preHandler: requirePremium }, async (request, reply) => {
+  const { name, description, color, redirectTo } = request.body as {
+    name: string
+    description?: string
+    color?: string
+    redirectTo?: string
+  }
+
+  if (!name || name.trim().length === 0) {
+    // Buscar temas para recarregar a página de criação de card
+    const themes = await prisma.theme.findMany({ orderBy: { name: 'asc' } })
+    // Se veio redirectTo, tenta renderizar a tela correta
+    if (redirectTo && redirectTo.startsWith('/card/')) {
+      // Buscar cardId
+      const cardId = redirectTo.split('/')[2]
+      const card = await prisma.customCard.findUnique({ 
+        where: { id: cardId },
+        include: { themeRelation: true }
+      })
+      return reply.view('card/edit.ejs', {
+        card,
+        themes,
+        user: request.session.user,
+        error: 'O nome do tema é obrigatório.'
+      })
+    }
+    return reply.view('premium/create.ejs', {
+      themes,
+      user: request.session.user,
+      error: 'O nome do tema é obrigatório.'
+    })
+  }
+
+  try {
+    await prisma.theme.create({
+      data: {
+        name: name.trim(),
+        description: description?.trim() || null,
+        color: color || null
+      }
+    })
+    if (redirectTo && redirectTo.startsWith('/card/')) {
+      return reply.redirect(redirectTo)
+    }
+    return reply.redirect('/create')
+  } catch (error) {
+    const themes = await prisma.theme.findMany({ orderBy: { name: 'asc' } })
+    if (redirectTo && redirectTo.startsWith('/card/')) {
+      // Buscar cardId
+      const cardId = redirectTo.split('/')[2]
+      const card = await prisma.customCard.findUnique({ 
+        where: { id: cardId },
+        include: { themeRelation: true }
+      })
+      return reply.view('card/edit.ejs', {
+        card,
+        themes,
+        user: request.session.user,
+        error: 'Erro ao criar tema. Tente novamente.'
+      })
+    }
+    return reply.view('premium/create.ejs', {
+      themes,
+      user: request.session.user,
+      error: 'Erro ao criar tema. Tente novamente.'
+    })
+  }
+})
+
 // =============================================================================
 // ROTAS DE ASSINATURA
 // =============================================================================
