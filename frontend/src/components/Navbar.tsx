@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 items-center">
                 <Link
                   to="/login"
                   className="text-gray-600 hover:text-primary-600 transition-colors"
