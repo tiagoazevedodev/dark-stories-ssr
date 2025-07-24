@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('@dark-stories/token');
-    const savedUser = localStorage.getItem('user');
+    const savedUser = localStorage.getItem('@dark-stories/user');
 
     if (token && savedUser) {
       try {
@@ -38,16 +38,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Verify token is still valid
         authAPI.getMe().then(({ user }) => {
           setUser(user);
-          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('@dark-stories/user', JSON.stringify(user));
         }).catch(() => {
           // Token is invalid
           localStorage.removeItem('@dark-stories/token');
-          localStorage.removeItem('user');
+          localStorage.removeItem('@dark-stories/user');
           setUser(null);
         });
       } catch (error) {
         localStorage.removeItem('@dark-stories/token');
-        localStorage.removeItem('user');
+        localStorage.removeItem('@dark-stories/user');
       }
     }
     setLoading(false);
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.login(email, password);
       setUser(response.user);
       localStorage.setItem('@dark-stories/token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('@dark-stories/user', JSON.stringify(response.user));
     } catch (error) {
       throw error;
     }
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.register(name, email, password);
       setUser(response.user);
       localStorage.setItem('@dark-stories/token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('@dark-stories/user', JSON.stringify(response.user));
     } catch (error) {
       throw error;
     }
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('@dark-stories/token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('@dark-stories/user');
   };
 
   const value = {

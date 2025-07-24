@@ -26,7 +26,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('@dark-stories/token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('@dark-stories/user');
       window.location.href = '/login';
     }
     return Promise.reject(error);
