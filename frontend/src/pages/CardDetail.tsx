@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { DailyCard, CustomCard, CardType } from '../types';
 import { cardsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import FlipCard from '../components/FlipCard';
+import { Button } from '../components/ui/button';
 
 const CardDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,8 +13,6 @@ const CardDetail: React.FC = () => {
   const [cardType, setCardType] = useState<CardType>('DAILY');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showSolution, setShowSolution] = useState(false);
-  const [currentClueIndex, setCurrentClueIndex] = useState(0);
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
 
@@ -64,18 +65,6 @@ const CardDetail: React.FC = () => {
     }
   };
 
-  const nextClue = () => {
-    if (card && currentClueIndex < card.clues.length - 1) {
-      setCurrentClueIndex(currentClueIndex + 1);
-    }
-  };
-
-  const prevClue = () => {
-    if (currentClueIndex > 0) {
-      setCurrentClueIndex(currentClueIndex - 1);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -88,142 +77,117 @@ const CardDetail: React.FC = () => {
     return (
       <div className="text-center py-12">
         <div className="text-red-600 mb-4">{error || 'Card not found'}</div>
-        <Link to="/" className="btn-primary">
-          Go Home
-        </Link>
+        <Button asChild>
+          <Link to="/">Go Home</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
+      {/* Navigation */}
       <div className="mb-6">
-        <Link to="/" className="text-primary-600 hover:text-primary-700 flex items-center">
-          ← Back to Home
-        </Link>
+        <Button variant="ghost" asChild className="text-primary-600 hover:text-primary-700">
+          <Link to="/" className="flex items-center space-x-2">
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Home</span>
+          </Link>
+        </Button>
       </div>
 
-      <div className="card">
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-center space-x-2 mb-4">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              cardType === 'DAILY' 
-                ? 'bg-primary-100 text-primary-800' 
-                : 'bg-blue-100 text-blue-800'
-            }`}>
-              {cardType === 'DAILY' ? 'Daily Mystery' : 'Custom Card'}
-            </span>
-            {card.themeRelation && (
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                {card.themeRelation.name}
-              </span>
-            )}
-          </div>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {card.title}
-          </h1>
-          
-          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-            {card.teaser}
-          </p>
+      {/* Layout with FlipCard and Instructions */}
+      <div className="grid lg:grid-cols-2 gap-8 items-start">
+        {/* FlipCard */}
+        <div className="perspective-1000">
+          <FlipCard
+            card={card}
+            cardType={cardType}
+            onLike={user ? handleLike : undefined}
+            liked={liked}
+            likeLoading={likeLoading}
+            showAuthor={cardType === 'CUSTOM'}
+          />
+        </div>
 
-          {card.imageUrl && (
-            <div className="mb-6">
-              <img
-                src={card.imageUrl}
-                alt={card.title}
-                className="w-full max-w-lg mx-auto rounded-lg shadow-md"
-              />
-            </div>
-          )}
-
-          <div className="flex justify-center items-center space-x-6 text-sm text-gray-500">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleLike}
-                disabled={!user || likeLoading}
-                className={`flex items-center space-x-1 ${
-                  user ? 'hover:text-red-500 cursor-pointer' : 'cursor-not-allowed'
-                } ${liked ? 'text-red-500' : ''}`}
-              >
-                <span>❤️</span>
-                <span>{card.likesCount}</span>
-              </button>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span>👁️</span>
-              <span>{card.viewsCount}</span>
-            </div>
-            {'user' in card && (
-              <div className="flex items-center space-x-1">
-                <span>👤</span>
-                <span>by {card.user?.name}</span>
+        {/* Instructions and Info */}
+        <div className="space-y-6">
+          {/* How to Play */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">How to Play</h2>
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">1</span>
+                <p>Read the mysterious scenario on the front of the card</p>
               </div>
+              <div className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">2</span>
+                <p>Click the rotate icon to flip to the "Master View" (back)</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">3</span>
+                <p>The Game Master reads clues one by one to help players guess</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">4</span>
+                <p>Players ask yes/no questions based on the clues</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">5</span>
+                <p>Reveal the solution when players are ready or stuck</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Master Instructions */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-amber-900 mb-3">📖 Game Master Tips</h3>
+            <ul className="text-sm text-amber-800 space-y-2">
+              <li>• Only you should see the back of the card (clues & solution)</li>
+              <li>• Give clues gradually - don't reveal everything at once</li>
+              <li>• Answer players' yes/no questions based on the solution</li>
+              <li>• Encourage creative thinking and lateral reasoning</li>
+              <li>• Have fun and don't be afraid to give hints if players are stuck!</li>
+            </ul>
+          </div>
+
+          {/* Card Stats */}
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Card Statistics</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Likes</span>
+                <div className="text-lg font-semibold text-gray-900">{card.likesCount}</div>
+              </div>
+              <div>
+                <span className="text-gray-500">Views</span>
+                <div className="text-lg font-semibold text-gray-900">{card.viewsCount}</div>
+              </div>
+              <div>
+                <span className="text-gray-500">Clues</span>
+                <div className="text-lg font-semibold text-gray-900">{card.clues.length}</div>
+              </div>
+              <div>
+                <span className="text-gray-500">Type</span>
+                <div className="text-lg font-semibold text-gray-900">
+                  {cardType === 'DAILY' ? 'Daily' : 'Custom'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex space-x-4">
+            <Button asChild className="flex-1">
+              <Link to="/">Explore More Cards</Link>
+            </Button>
+            {user && (
+              <Button variant="outline" asChild className="flex-1">
+                <Link to="/create-card">Create Your Own</Link>
+              </Button>
             )}
           </div>
         </div>
-
-        {!showSolution ? (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold mb-4">
-                Clue {currentClueIndex + 1} of {card.clues.length}
-              </h2>
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <p className="text-lg text-gray-800">
-                  {card.clues[currentClueIndex]}
-                </p>
-              </div>
-
-              <div className="flex justify-center space-x-4 mb-6">
-                <button
-                  onClick={prevClue}
-                  disabled={currentClueIndex === 0}
-                  className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous Clue
-                </button>
-                <button
-                  onClick={nextClue}
-                  disabled={currentClueIndex === card.clues.length - 1}
-                  className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next Clue
-                </button>
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={() => setShowSolution(true)}
-                  className="btn-primary"
-                >
-                  Reveal Solution
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4 text-green-600">
-              🎉 Solution Revealed!
-            </h2>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-              <p className="text-lg text-gray-800">
-                {card.solution}
-              </p>
-            </div>
-            <button
-              onClick={() => setShowSolution(false)}
-              className="btn-secondary mr-4"
-            >
-              Hide Solution
-            </button>
-            <Link to="/" className="btn-primary">
-              Solve Another Mystery
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

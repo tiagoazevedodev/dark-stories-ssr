@@ -3,25 +3,450 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Main theme colors - Dark noir theme */
+    --background: 240 10% 7%;          /* noir-900 */
+    --foreground: 240 7% 84%;          /* noir-50 */
+    
+    /* Card colors */
+    --card: 240 8% 11%;                /* noir-800 */
+    --card-foreground: 240 7% 84%;     /* noir-50 */
+    
+    /* Popover colors */
+    --popover: 240 8% 11%;             /* noir-800 */
+    --popover-foreground: 240 7% 84%;  /* noir-50 */
+    
+    /* Primary colors - Crimson accent */
+    --primary: 347 77% 50%;            /* crimson-500 */
+    --primary-foreground: 240 7% 84%; /* noir-50 */
+    
+    /* Secondary colors */
+    --secondary: 240 6% 20%;           /* noir-600 */
+    --secondary-foreground: 240 7% 84%; /* noir-50 */
+    
+    /* Muted colors */
+    --muted: 240 5% 26%;               /* noir-500 */
+    --muted-foreground: 240 5% 64%;    /* noir-200 */
+    
+    /* Accent colors */
+    --accent: 240 6% 20%;              /* noir-600 */
+    --accent-foreground: 240 7% 84%;   /* noir-50 */
+    
+    /* Destructive colors */
+    --destructive: 347 87% 44%;        /* crimson-600 */
+    --destructive-foreground: 240 7% 84%; /* noir-50 */
+    
+    /* Border and input colors */
+    --border: 240 5% 26%;              /* noir-500 */
+    --input: 240 6% 20%;               /* noir-600 */
+    --ring: 347 77% 50%;               /* crimson-500 */
+    
+    /* Border radius */
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Enhanced scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-noir-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-noir-600 rounded-full;
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-noir-500;
+  }
+
+  ::-webkit-scrollbar-corner {
+    @apply bg-noir-800;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) hsl(var(--card));
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
 @layer components {
+  /* Button styles */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground 
+           font-medium py-2.5 px-6 rounded-lg transition-all duration-300 
+           shadow-noir hover:shadow-noir-lg hover:-translate-y-0.5 
+           active:translate-y-0 active:shadow-noir;
   }
   
   .btn-secondary {
-    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground 
+           font-medium py-2.5 px-6 rounded-lg transition-all duration-300 
+           shadow-noir hover:shadow-noir-lg;
   }
   
+  .btn-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground 
+           font-medium py-2.5 px-6 rounded-lg transition-all duration-200;
+  }
+
+  /* Card styles */
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 border border-gray-200;
+    @apply bg-card text-card-foreground rounded-xl border border-border/50 
+           shadow-noir-lg backdrop-blur-sm transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:shadow-noir-xl hover:-translate-y-1 hover:border-border/80;
+  }
+
+  .card-glow {
+    @apply shadow-crimson hover:shadow-crimson;
   }
   
+  /* Input styles */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 bg-input border border-border rounded-lg 
+           text-foreground placeholder:text-muted-foreground 
+           focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent 
+           transition-all duration-200 shadow-inner-noir;
   }
+
+  /* Mystery-themed components */
+  .mystery-card {
+    @apply bg-gradient-to-br from-card via-card/95 to-noir-700/50 
+           border border-border/30 rounded-xl shadow-noir-xl 
+           backdrop-blur-md relative overflow-hidden;
+  }
+
+  .mystery-card::before {
+    content: '';
+    @apply absolute inset-0 bg-noise opacity-30 pointer-events-none;
+  }
+
+  .mystery-glow {
+    transition: all 0.3s ease;
+  }
+
+  .mystery-glow:hover {
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.5), 
+      0 10px 10px -5px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(239, 68, 68, 0.15);
+  }
+
+  .glass-effect {
+    @apply bg-background/20 backdrop-blur-lg border border-border/20 
+           shadow-noir-lg;
+  }
+
+  /* Navigation styles */
+  .nav-link {
+    @apply text-muted-foreground hover:text-foreground 
+           transition-colors duration-200 relative font-medium;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary 
+           rounded-full transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Text effects */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-crimson-400 via-crimson-500 to-amber-500 
+           bg-clip-text text-transparent;
+  }
+
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Interactive elements */
+  .hover-lift {
+    @apply transform transition-all duration-300 hover:-translate-y-1 
+           hover:shadow-noir-xl;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-crimson;
+  }
+
+  .hover-scale {
+    @apply transform transition-all duration-200 hover:scale-105 
+           active:scale-95;
+  }
+
+  /* Loading states */
+  .skeleton {
+    @apply bg-muted animate-pulse rounded;
+  }
+
+  /* Badge styles */
+  .badge-primary {
+    @apply bg-primary/10 text-primary border border-primary/20 
+           px-2.5 py-1 rounded-md text-xs font-medium;
+  }
+
+  .badge-secondary {
+    @apply bg-secondary/20 text-secondary-foreground border border-secondary/30 
+           px-2.5 py-1 rounded-md text-xs font-medium;
+  }
+
+  /* 3D Effects for flip cards */
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+  }
+
+  /* Flip Card Implementation */
+  .flip-card-container {
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    position: relative;
+  }
+
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 420px;
+    height: auto;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    cursor: pointer;
+  }
+
+  .flip-card-inner:hover:not(.flipped) {
+    /* Only apply hover effects when not flipped */
+  }
+
+  .flip-card-inner.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 420px;
+    height: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .flip-card-front {
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card))/95% 50%, hsl(240, 7%, 15%)/50% 100%);
+    border: 1px solid hsl(var(--border))/30;
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.5), 
+      0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .flip-card-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .flip-card-inner:hover:not(.flipped) .flip-card-front {
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.5), 
+      0 10px 10px -5px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(239, 68, 68, 0.15);
+    /* Removi o transform: translateY(-2px) que estava causando conflito */
+  }
+
+  .flip-card-back {
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 50%, hsl(var(--background))/80% 100%);
+    border: 1px solid hsl(var(--primary))/20;
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.5), 
+      0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    transform: rotateY(180deg);
+    color: hsl(var(--foreground));
+    z-index: 1;
+  }
+
+  /* Utility classes for layout */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* Focus trap for modals */
+  .focus-trap {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Custom utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .border-glow {
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+  }
+
+  /* Dark mode utilities */
+  .dark-mode-transition {
+    @apply transition-colors duration-300 ease-in-out;
+  }
+
+  /* Flip card specific animations */
+  .shadow-mystery {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+  100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    opacity: 0.8;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
 } 
