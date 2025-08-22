@@ -39,22 +39,22 @@ const Navbar: React.FC = () => {
 
             {/* Navigation Links - Desktop */}
             <div className="hidden md:flex items-center space-x-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/" className="nav-link flex items-center space-x-2">
-                  <Home className="h-4 w-4" />
-                  <span>Home</span>
-                </Link>
-              </Button>
 
               {user && (
                 <>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/" className="nav-link flex items-center space-x-2">
+                      <Home className="h-4 w-4" />
+                      <span>Home</span>
+                    </Link>
+                  </Button>
                   <Button variant="ghost" size="sm" asChild>
                     <Link to="/dashboard" className="nav-link flex items-center space-x-2">
                       <LayoutDashboard className="h-4 w-4" />
                       <span>Dashboard</span>
                     </Link>
                   </Button>
-                  
+
                   <Button variant="ghost" size="sm" asChild>
                     <Link to="/create-card" className="nav-link flex items-center space-x-2">
                       <Plus className="h-4 w-4" />
@@ -88,9 +88,9 @@ const Navbar: React.FC = () => {
                 </div>
 
                 {/* Logout Button */}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleLogout}
                   className="flex items-center space-x-2 hover:border-destructive/50 hover:text-destructive"
                 >
@@ -128,14 +128,14 @@ const Navbar: React.FC = () => {
                   <span className="text-xs">Home</span>
                 </Link>
               </Button>
-              
+
               <Button variant="ghost" size="sm" asChild className="flex-1">
                 <Link to="/dashboard" className="flex flex-col items-center space-y-1 py-2">
                   <LayoutDashboard className="h-4 w-4" />
                   <span className="text-xs">Dashboard</span>
                 </Link>
               </Button>
-              
+
               <Button variant="ghost" size="sm" asChild className="flex-1">
                 <Link to="/create-card" className="flex flex-col items-center space-y-1 py-2">
                   <Plus className="h-4 w-4" />
